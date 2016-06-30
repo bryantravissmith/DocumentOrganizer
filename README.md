@@ -4,10 +4,12 @@ This is a toy project that tempts to match Key Images in documents to identify a
 
 ## Command Line Use
 
+```bash
 python documentsort.py \
 	--key_dir="<key-direct>" \
 	--doc_dir="<document-directory>"
 	--sort_dir="<sorted-document-directory>"
+```
 
 ## Directory Structure:
 
