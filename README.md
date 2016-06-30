@@ -15,6 +15,7 @@ python documentsort.py \
 
 The script will convert each page in the PDF in the doc_dir to images, and attempt to feature match the images from the key directory.  If there is a successful match, the script will copy the file to the appropriate directory in the sort_dir.   If there is not a match, it will be copied to the unsorted directory.   
 
+```bash
 |-- documents
 |   '-- tiaa.pdf
 |   |-- tiaa
@@ -41,3 +42,4 @@ The script will convert each page in the PDF in the doc_dir to images, and attem
     |-- unsorted
     `-- wellsfargo
         `-- wf01.pdf
+```
