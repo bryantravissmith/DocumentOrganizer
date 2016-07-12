@@ -2,6 +2,16 @@
 
 This is a toy project that tempts to match Key Images in documents to identify and sort the source of the document.   The use case is to auto-sort financial documents by institution using branded images
 
+## Dependencies
+
+This program runs successfully on Ubuntu 14.04 with 
+
+- OpenCV
+- Wand
+- Tesseract
+- ImageMagik
+
+
 ## Command Line Use
 
 ```bash
