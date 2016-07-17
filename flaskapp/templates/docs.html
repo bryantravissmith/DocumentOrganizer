@@ -1,24 +1,38 @@
-<!DOCTYPE html>
-<html lang = "en">
-   <head></head>
-   <body>
-      <h3>New Doc - </h3>
-      <hr/>
+{% extends "index.html" %}
+{% block content %}
+      
       
       {%- for category, message in get_flashed_messages(with_categories = true) %}
          <div class = "alert alert-danger">
             {{ message }}
          </div>
       {%- endfor %}
-      
-      <form action = "{{ request.path }}" method = "post" enctype="multipart/form-data">
-         <label for = "name">Doc Name</label><br>
-         <input type = "text" name = "name" placeholder = "Wellsfargo" /><br>
-         <input type=file name=file>
-         <input type = "submit" value = "Submit" />
-      </form>
-      
-      <table>
+      <hr>
+      <div class="container">
+         <h3>Upload New Doc </h3>
+         <form class="form-inline" action = "{{ request.path }}" method = "post" enctype="multipart/form-data">
+            <div class="form-group row">
+               <label for = "name" class="col-sm-2 form-control-label">Name</label>
+               <div class="col-sm-10">
+                  <input class="form-control" type = "text" name = "name" placeholder = "Wellsfargo" />
+               </div>
+            </div>
+            <div class="form-group row">
+               <label class="col-sm-2 form-control-label" for = "name">File</label>
+               <div class="col-sm-10">
+                  <input class="form-control" type=file name=file>
+               </div>
+            </div>
+            <div class="form-group row">
+             <div class="col-sm-offset-2 col-sm-10">
+               <button type="submit" class="btn btn-secondary">Upload</button>
+             </div>
+           </div>
+         </form>
+      </div>
+      <hr>
+      <div class="container">
+      <table class="table table-inverse">
          <thead>
             <tr>
                <th>Name</th>
@@ -33,29 +47,32 @@
             {% for doc in docs %}
                <tr>
                   <td>
-                     <a href="{{request.url_root}}{{doc.file_location}}" style="height:32px;"/>{{ doc.name }}</a>
+                     <a href="{{request.url_root}}{{doc.file_location}}" target="_blank"/>{{ doc.name }}</a>
                   </td>
                   <td>{{doc.uuid}}</td>
                   {% if doc.text %}
-                  <td> Extracted </td>
+                  <td> <a href="{{request.url_root}}doc/{{doc.id}}/text" >Extracted<a></td>
                   {% else %}
                   <td> Waiting </td>
                   {%endif %}
                   {% if doc.keys|length > 0 %}
-                  <td> {{doc.keys[0].name}} </td>
+                  <td> 
+                     {% for key in doc.keys %}
+                        {{key.name}} 
+                     {% endfor %}
+                  </td>
                   {% else %}
                   <td> Waiting </td>
                   {%endif %}
                 <td>
                   <form method="POST" action = "{{ request.path }}/{{ doc.id }}">
                      <input type = "hidden" name='delete' value='delete' />
-                     <input type = "submit" value = "Delete" /> 
+                     <button type="submit" class="btn btn-secondary">Delete</button>
                   </form>
                </td>
                </tr>
             {% endfor %}
          </tbody>
       </table>
-      
-   </body>
-</html>
+   </div>
+{% endblock %}

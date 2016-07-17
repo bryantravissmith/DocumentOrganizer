@@ -128,27 +128,52 @@ def get_doc_img_locations(doc):
 	imgs = glob.glob(os.path.join(folder,"*.jpg"))
 	return imgs
 
-def updateMatchesForNewKey(key_id):
-	Key = key.query.filter_by(id=key_id).all()
+def updateImgMatchesForNewKey(key_id):
+	print "Matching Docs for Upload Key Id:{}".format(key_id)
+	Key = key.query.filter_by(id=key_id).first()
 	KeyImg = key_img.query.filter_by(key_id=key_id).all()
-	for Doc in doc.query.all(): 	
-		match = False
-		for doc_image_location in get_doc_img_locations(Doc):
-			for keyImg in KeyImg:
-				if detectKeyInImage(keyImg.file_location, doc_image_location):
-					Doc.keys = Key
-					db.session.commit()
-					match = True
+	for Doc in doc.query.all(): 
+		if not (Doc in Key.docs):	
+			match = False
+			for doc_image_location in get_doc_img_locations(Doc):
+				for keyImg in KeyImg:
+					if detectKeyInImage(keyImg.file_location, doc_image_location):
+						db.session.refresh(Doc)
+						db.session.refresh(Key)
+						if not (Doc in Key.docs):
+							Doc.keys.append(Key)
+							db.session.commit()
+						match = True
+					if match:
+						break
 				if match:
-					break
-			if match:
-				break	
+					break	
 
-def updateMatchesForNewDoc():
-	pass
+def updateImgMatchesForNewDoc(doc_id):
+	print "Matching Keys for Upload Doc Id:{}".format(doc_id)
+	Doc = doc.query.filter_by(id=doc_id).first()
+	Keys = key.query.all()
+	doc_image_locations = get_doc_img_locations(Doc)
+	for Key in Keys:
+		if not (Doc in Key.docs):	
+			match = False
+			KeyImg = key_img.query.filter_by(key_id=Key.id).all()
+			for doc_image_location in get_doc_img_locations(Doc):
+				for keyImg in KeyImg:
+					if detectKeyInImage(keyImg.file_location, doc_image_location):
+						db.session.refresh(Doc)
+						db.session.refresh(Key)
+						if not (Doc in Key.docs):
+							Doc.keys.append(Key)
+							db.session.commit()
+						match = True
+					if match:
+						break
+				if match:
+					break	
 
 def extractTextInImage(doc_location,doc_id):
-	print doc_id
+	print "Extracting Text for Doc Id:{}".format(doc_id)
 	folder, ending = doc_location.rsplit(".",1)
 	imgs = glob.glob(os.path.join(folder,"*.jpg"))
 	img_text = ""
@@ -161,6 +186,7 @@ def extractTextInImage(doc_location,doc_id):
 	Doc.text = unicode(img_text, "utf-8")
 	db.session.add(Doc)
 	db.session.commit()
+	
 
 
 def convertPdfToImage(file_loc,doc_id):
@@ -179,6 +205,17 @@ def convertPdfToImage(file_loc,doc_id):
 				page_image.save(filename=save_location)
 		t1 = threading.Thread(target=extractTextInImage,args=(file_loc,doc_id))
 		t1.start()
+		t2 = threading.Thread(target=updateImgMatchesForNewDoc,args=(doc_id,))
+		t2.start()
+
+@app.route('/')
+def home():
+	return render_template("index.html")
+
+
+@app.route('/about')
+def about():
+	return render_template("index.html")
 
 @app.route('/uploads/docs/<filename>')
 def send_doc(filename):
@@ -188,17 +225,24 @@ def send_doc(filename):
 def send_key(filename):
     return send_from_directory(os.path.join(UPLOAD_FOLDER,"keys"), filename)
 
+@app.route('/doc/<doc_id>/text', methods = ['GET'])
+def show_doc_text(doc_id):
+	Doc = doc.query.filter_by(id=int(doc_id)).first()
+	return render_template("text.html",text=Doc.text)
+
 @app.route('/doc/<doc_id>',methods = ['GET','POST'])
 def delete_doc(doc_id):
 	if request.method == 'POST':
 		if not request.form['delete']:
-			return redirect(url_for('show_all'))
+			return redirect(url_for('show_all_docs'))
 		docToDelete = doc.query.filter_by(id=int(doc_id)).first()
 		if os.path.exists(docToDelete.file_location):
 			os.remove(docToDelete.file_location)
 		directory = docToDelete.file_location.rsplit('.',1)[0]
 		if os.path.isdir(directory):
 			shutil.rmtree(directory)
+		docToDelete.keys = []
+		db.session.commit()
 		db.session.delete(docToDelete)
 		db.session.commit()
 	return redirect(url_for('show_all_docs'))
@@ -210,7 +254,10 @@ def delete_key(key_id):
 			return redirect(url_for('show_all'))
 		keyToDelete = key.query.filter_by(id=int(key_id)).first()
 		for keyImg in keyToDelete.imgs:
-			os.remove(keyImg.file_location)
+			if os.path.exists(keyImg.file_location):
+				os.remove(keyImg.file_location)
+		keyToDelete.docs = []
+		db.session.commit()
 		db.session.delete(keyToDelete)
 		db.session.commit()
 	return redirect(url_for('show_all_keys'))
@@ -262,7 +309,7 @@ def show_all_keys():
 			Key.imgs = imgs
 			db.session.add(Key)
 			db.session.commit()
-			t = threading.Thread(target=updateMatchesForNewKey,args=(Key.id,))
+			t = threading.Thread(target=updateImgMatchesForNewKey,args=(Key.id,))
 			t.start()
 			flash('Record was successfully added')
 			return redirect(url_for('show_all_keys'))

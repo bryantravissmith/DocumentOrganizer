@@ -1,26 +1,43 @@
-<!DOCTYPE html>
-<html lang = "en">
-   <head></head>
-   <body>
-      <h3>New Key - </h3>
-      <hr/>
+{% extends "index.html" %}
+{% block content %}
       
       {%- for category, message in get_flashed_messages(with_categories = true) %}
-         <div class = "alert alert-danger">
+         <div class = "alert alert-info">
             {{ message }}
          </div>
       {%- endfor %}
-      
-      <form action = "{{ request.path }}" method = "post" enctype="multipart/form-data">
-         <label for = "name">Key Name</label><br>
-         <input type = "text" name = "name" placeholder = "Wellsfargo" /><br>
-         <label for = "text">Words (Comma Separated)</label><br>
-         <input type = "text" name = "text" placeholder = "wellsfargo" /><br>
-         <input type=file name=file>
-         <input type = "submit" value = "Submit" />
+      <hr>
+      <div class="container">
+          <h3>Create New Key </h3>
+      <form class="form-inline"  action = "{{ request.path }}" method = "post" enctype="multipart/form-data">
+         <div class="form-group row">
+               <label for = "name" class="col-sm-2 form-control-label">Key Name</label>
+               <div class="col-sm-10">
+                  <input class="form-control" type = "text" name = "name" placeholder = "Tiaa-Cref" />
+               </div>
+            </div>
+             <div class="form-group row">
+               <label for = "name" class="col-sm-2 form-control-label">Terms</label>
+               <div class="col-sm-10">
+                  <input class="form-control" type = "text" name = "text" placeholder = "tiaa, cref, tiaa-cref, ..." />
+               </div>
+            </div>
+            <div class="form-group row">
+               <label class="col-sm-2 form-control-label" for = "name">File</label>
+               <div class="col-sm-10">
+                  <input class="form-control" type=file name=file>
+               </div>
+            </div>
+            <div class="form-group row">
+             <div class="col-sm-offset-2 col-sm-10">
+               <button type="submit" class="btn btn-secondary">Upload</button>
+             </div>
+           </div>
       </form>
-      
-      <table>
+      </div>
+      <hr>
+      <div class="container">
+      <table class="table table-inverse">
          <thead>
             <tr>
                <th>Name</th>
@@ -52,6 +69,5 @@
             {% endfor %}
          </tbody>
       </table>
-      
-   </body>
-</html>
+   </div>
+{% endblock %}
