@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang = "en">
+   <head></head>
+   <body>
+      <h3>New Key - </h3>
+      <hr/>
+      
+      {%- for category, message in get_flashed_messages(with_categories = true) %}
+         <div class = "alert alert-danger">
+            {{ message }}
+         </div>
+      {%- endfor %}
+      
+      <form action = "{{ request.path }}" method = "post" enctype="multipart/form-data">
+         <label for = "name">Key Name</label><br>
+         <input type = "text" name = "name" placeholder = "Wellsfargo" /><br>
+         <label for = "text">Words (Comma Separated)</label><br>
+         <input type = "text" name = "text" placeholder = "wellsfargo" /><br>
+         <input type=file name=file>
+         <input type = "submit" value = "Submit" />
+      </form>
+      
+      <table>
+         <thead>
+            <tr>
+               <th>Name</th>
+               <th>Terms</th>
+               <th>File Locations</th>
+               <th>Delete<th>
+            </tr>
+         </thead>
+         
+         <tbody>
+            {% for key in keys %}
+               <tr>
+                  <td>{{ key.name }}</td>
+                  <td>{{ key.terms }}
+
+                  </td>
+                  <td>
+                   {% for img in key.imgs %}
+                     <img src="{{request.url_root}}{{img}}" style="height:32px;"/>
+                   {% endfor %}
+                </td>
+                <td>
+                  <form method="POST" action = "{{ request.path }}/{{ key.id }}">
+                     <input type = "hidden" name='delete' value='delete' />
+                     <input type = "submit" value = "Delete" /> 
+                  </form>
+               </td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+      
+   </body>
+</html>
