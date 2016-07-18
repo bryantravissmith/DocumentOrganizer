@@ -1,3 +1,3 @@
 # Doc Upload Folder
 
-TBD
+A folder where all documents will be stored.  
