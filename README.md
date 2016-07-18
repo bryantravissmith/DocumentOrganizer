@@ -1,15 +1,18 @@
 # Document Sorter
 
-This is a toy project that tempts to match Key Images in documents to identify and sort the source of the document.   The use case is to auto-sort financial documents by institution using branded images
+This is a toy project that attempts to match Key Images in documents to identify and sort the source of the document.   The use case is to auto-sort financial documents by institution using branded images.
+
+Based on feedback I have recieved, I have slightly expanded the project from a command-line based tool to a toy webapp and have a webapp for creating keys and uploading documents, with matching processes spawned into separate threads, as well as extracting text from documents using OCR methods. This extension is in the flask-app folder.
 
 ## Dependencies
 
 This program runs successfully on Ubuntu 14.04 with 
 
-- OpenCV
-- Wand
-- Tesseract
-- ImageMagik
+- Python 2.7
+- OpenCV (built from source)
+- Wand (pip) 
+- Tesseract (apt-get)
+- ImageMagik (apt-get)
 
 
 ## Command Line Use

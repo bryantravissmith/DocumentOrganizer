@@ -210,12 +210,7 @@ def convertPdfToImage(file_loc,doc_id):
 
 @app.route('/')
 def home():
-	return render_template("index.html")
-
-
-@app.route('/about')
-def about():
-	return render_template("index.html")
+	return render_template("home.html")
 
 @app.route('/uploads/docs/<filename>')
 def send_doc(filename):
