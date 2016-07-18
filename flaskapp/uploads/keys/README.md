@@ -1,3 +1,3 @@
 # Key Upload Folder
 
-TBD
+Folder where all key images will be stored.
